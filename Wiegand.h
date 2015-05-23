@@ -18,14 +18,14 @@ struct WiegandCode
 {
     int bitCount;
     int* buffer;
-    WiegandCode::WiegandCode()
+    WiegandCode()
     {
         bitCount = 0;
         buffer = new int[BUFFER_SIZE];
         memset(buffer, 0, BUFFER_SIZE);
     }
 
-    WiegandCode::WiegandCode(const WiegandCode& code)
+    WiegandCode(const WiegandCode& code)
     {
         bitCount = 0;
         buffer = new int[BUFFER_SIZE];
@@ -36,7 +36,7 @@ struct WiegandCode
         }
     }
 
-    WiegandCode::~WiegandCode
+    ~WiegandCode()
     {
         delete buffer;
     }
@@ -52,11 +52,11 @@ public:
 	bool available();
 	WiegandCode getCode();
 	int getWiegandType();
-	
+    void ReadD0();
+    void ReadD1();
+
 private:
-    void init(unsigned int d0Pin, unsigned int d1Pin)
-	void ReadD0();
-	void ReadD1();
+    void init(unsigned int d0Pin, unsigned int d1Pin);
 	void readBit(bool highBit);
 
 	bool DoWiegandConversion ();
@@ -65,8 +65,8 @@ private:
 	unsigned int    _d0Pin;
     unsigned int    _d1Pin;
     int*            _tempBuffer;
-    int             _indexHigh;
-    int             _indexLow;
+    int             _tempIndexHigh;
+    int             _tempIndexLow;
 	unsigned long 	_lastWiegand;
 	unsigned long 	_sysTick;
 	int				_bitCount;

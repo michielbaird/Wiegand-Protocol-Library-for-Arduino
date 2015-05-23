@@ -7,24 +7,23 @@ WIEGAND::WIEGAND()
 
 WIEGAND::WIEGAND(unsigned int d0Pin, unsigned int d1Pin)
 {
-   init(d0Pin, d1Pin)
+   init(d0Pin, d1Pin);
 }
 
 void WIEGAND::init(unsigned int d0Pin, unsigned int d1Pin)
 {
-    _tempBuffer = new int[BufferSize];
+    _tempBuffer = new int[BUFFER_SIZE];
     _tempIndexHigh = 0;
     _tempIndexLow = 0;
     _lastWiegand=0;
     _sysTick=0;
-    _code=0;
     _bitCount=0;
     _wiegandType=0;
     _d0Pin = d0Pin;
     _d1Pin = d1Pin;
 }
 
-void WIEGAND::~WIEGAND() {
+WIEGAND::~WIEGAND() {
     delete _tempBuffer;
 }
 
@@ -48,14 +47,11 @@ void WIEGAND::begin()
 	_lastWiegand = 0;
     _tempIndexHigh = 0;
     _tempIndexLow = 0;
-	_code = 0;
 	_wiegandType = 0;
 	_bitCount = 0;  
 	_sysTick=millis();
 	pinMode(_d0Pin, INPUT);					// Set D0 pin as input
 	pinMode(_d1Pin, INPUT);					// Set D1 pin as input
-	attachInterrupt(0, ReadD0, FALLING);	// Hardware interrupt - high to low pulse
-	attachInterrupt(1, ReadD1, FALLING);	// Hardware interrupt - high to low pulse
 }
 
 void WIEGAND::ReadD0 ()
@@ -77,7 +73,7 @@ void WIEGAND::readBit(bool highBit)
     if (_tempIndexLow == INT_SIZE)
     {
         _tempIndexLow = 0;
-        _cardTempHigh++;
+        _tempIndexHigh++;
     }
 
     _lastWiegand = _sysTick;	// Keep track of last wiegand bit received
@@ -90,11 +86,11 @@ WiegandCode WIEGAND::getWiegandCode ()
 
 	WiegandCode code;
 	code.bitCount = _bitCount;
-	bufferIndexH = 0;
-	bufferIndexL = 0;
+	int bufferIndexH = 0;
+	int bufferIndexL = 0;
 	for (int hIndex = _tempIndexHigh; hIndex <= 0; hIndex--)
 	{
-	    for (int lIndex= __tempIndexLow; lIndex <= 0; lIndex--)
+	    for (int lIndex= _tempIndexLow; lIndex <= 0; lIndex--)
 	    {
 	        code.buffer[bufferIndexH] |= ((_tempBuffer[hIndex] >> lIndex) & 1) << bufferIndexL;
 	        bufferIndexL++;
