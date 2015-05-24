@@ -50,8 +50,8 @@ void WIEGAND::begin()
 	_wiegandType = 0;
 	_bitCount = 0;  
 	_sysTick=millis();
-	pinMode(_d0Pin, INPUT);					// Set D0 pin as input
-	pinMode(_d1Pin, INPUT);					// Set D1 pin as input
+	pinMode(_d0Pin, INPUT_PULLUP);					// Set D0 pin as input
+	pinMode(_d1Pin, INPUT_PULLUP);					// Set D1 pin as input
 }
 
 void WIEGAND::ReadD0 ()
@@ -67,15 +67,14 @@ void WIEGAND::ReadD1()
 void WIEGAND::readBit(bool highBit)
 {
     _bitCount++;
-    _tempBuffer[_tempIndexHigh] &= !(1 << _tempIndexLow);
-    _tempBuffer[_tempIndexHigh] |= highBit << _tempIndexLow;
+    _tempBuffer[_tempIndexHigh] &= ~(1 << _tempIndexLow);
+    _tempBuffer[_tempIndexHigh] |= ((int)highBit) << _tempIndexLow;
     _tempIndexLow++;
     if (_tempIndexLow == INT_SIZE)
     {
         _tempIndexLow = 0;
         _tempIndexHigh++;
     }
-
     _lastWiegand = _sysTick;	// Keep track of last wiegand bit received
 }
 
@@ -83,16 +82,16 @@ void WIEGAND::readBit(bool highBit)
 WiegandCode WIEGAND::getWiegandCode ()
 {
 	// Bits were read in reverse: So they need to switch back
-
 	WiegandCode code;
 	code.bitCount = _bitCount;
 	int bufferIndexH = 0;
 	int bufferIndexL = 0;
-	for (int hIndex = _tempIndexHigh; hIndex <= 0; hIndex--)
+	for (int hIndex = _tempIndexHigh; hIndex >= 0; hIndex--)
 	{
-	    for (int lIndex= _tempIndexLow; lIndex <= 0; lIndex--)
+	    for (int lIndex= _tempIndexLow - 1; lIndex >= 0; lIndex--)
 	    {
 	        code.buffer[bufferIndexH] |= ((_tempBuffer[hIndex] >> lIndex) & 1) << bufferIndexL;
+
 	        bufferIndexL++;
 	        if (bufferIndexL == INT_SIZE)
 	        {
@@ -107,7 +106,6 @@ WiegandCode WIEGAND::getWiegandCode ()
 
 bool WIEGAND::DoWiegandConversion ()
 {
-	unsigned long cardID;
 	
 	_sysTick=millis();
 	if ((_sysTick - _lastWiegand) > 25)								// if no more signal coming through after 25ms

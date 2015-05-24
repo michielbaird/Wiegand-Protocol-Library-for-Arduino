@@ -22,15 +22,17 @@ struct WiegandCode
     {
         bitCount = 0;
         buffer = new int[BUFFER_SIZE];
-        memset(buffer, 0, BUFFER_SIZE);
+        for (int index = 0; index < BUFFER_SIZE; ++index)
+        {
+            buffer[index] = 0;
+        }
     }
 
     WiegandCode(const WiegandCode& code)
     {
-        bitCount = 0;
+        bitCount = code.bitCount;
         buffer = new int[BUFFER_SIZE];
-        memset(buffer, 0, BUFFER_SIZE);
-        for (int index; index < BUFFER_SIZE; ++index)
+        for (int index = 0; index < BUFFER_SIZE; ++index)
         {
             buffer[index] = code.buffer[index];
         }
