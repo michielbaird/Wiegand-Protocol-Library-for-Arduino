@@ -18,12 +18,6 @@ void WIEGAND::init(unsigned int d0Pin, unsigned int d1Pin)
     _wiegandType=0;
     _d0Pin = d0Pin;
     _d1Pin = d1Pin;
-    _configs[0].name[0] = 'T';
-    _configs[0].name[1] = 'E';
-    _configs[0].name[2] = 'S';
-    _configs[0].name[3] = 'T';
-    _configs[0].name[4] = '1';
-    _configs[0].name[5] = '\0';
 
     _configs[0].bitLength = 26;
     _configs[0].idFieldStartBit = 9;
@@ -167,7 +161,7 @@ bool WIEGAND::DoWiegandConversion ()
                         userField |= (bool)_code[k];
                     }
                     Serial.print("FACILITY CODE ");
-                    Serial.println(userField.to_ulong());
+                    //Serial.println(userField.to_ulong());
                     if (userField == _configs[i].userFields[j].successId) {
                         returnCode.successes[j] = true;
                     } else if (userField == _configs[i].userFields[j].failureId) {
