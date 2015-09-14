@@ -1,12 +1,21 @@
 #include "bitfield.h"
 
 BitField::BitField(int size) {
+    this.size = size;
     for (int i = 0; i < _BUCKETS; ++i) {
         buffer[i] = 0;
     }
 }
 
+BitField::BitField(const BitField& rhs) {
+    this.size = rhs.size;
+    for (int i = 0; i < _BUCKETS; ++i) {
+        buffer[i] = rhs.buffer[i];
+    }
+}
+
 BitField::BitField() {
+    size = 32;
     for (int i = 0; i < _BUCKETS; ++i) {
         buffer[i] = 0;
     }

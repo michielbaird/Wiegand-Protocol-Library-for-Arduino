@@ -62,7 +62,7 @@ public:
 	int getWiegandType();
     void ReadD0();
     void ReadD1();
-    WiegandConfig  _configs[1];
+    WiegandConfig config;
 
 private:
     void init(unsigned int d0Pin, unsigned int d1Pin);
