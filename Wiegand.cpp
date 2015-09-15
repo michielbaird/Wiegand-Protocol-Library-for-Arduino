@@ -110,81 +110,83 @@ bool WIEGAND::DoWiegandConversion ()
 		if (_bitCount > 0)
 		{
 		    //Serial.println("here ");
-		    Serial.println(_bitCount);
+		    //Serial.println(_bitCount);
 
 		    bool valid = false;
 		    WiegandReturn returnCode;
 		    _code = getWiegandCode();
 //		    for (int i = 0; i < 1; ++i) { //TODO: work for all
-		        if (_bitCount != config.bitLength) {
-		            continue;
-		        }
-		        //Serial.println("here 2");
+            if (_bitCount != config.bitLength) {
+                _bitCount=0;
+                return false;
+            }
+            //Serial.println("here 2");
 
-                bool valid_parity = true;
-                for (int j = 0; j < config.numParityBits; j++) {
-                    int val = 0;
-                    for (int k = 0; k < _bitCount; k++) {
-                        if (config.parityBits[j].mask[k]) {
-                            val ^= _code[k];
-                            Serial.print(_code[k]);
-                        }
+            bool valid_parity = true;
+            for (int j = 0; j < config.numParityBits; j++) {
+                int val = 0;
+                for (int k = 0; k < _bitCount; k++) {
+                    if (config.parityBits[j].mask[k]) {
+                        val ^= _code[k];
+                        Serial.print(_code[k]);
                     }
+                }
 
-                    if (config.parityBits[j].evenParity) {
-                       val ^= 1;
-                    }
+                if (config.parityBits[j].evenParity) {
+                   val ^= 1;
+                }
 
-                    if (_code[config.parityBits[j].bitPosition] !=
-                        (bool) val) {
-                        Serial.print(" Parity Bad ");
-                        Serial.println(j + 1);
-                        valid_parity = false;
-                        continue;
-                    }
-                    Serial.print(" Parity Ok ");
+                if (_code[config.parityBits[j].bitPosition] !=
+                    (bool) val) {
+                    Serial.print(" Parity Bad ");
                     Serial.println(j + 1);
-                }
-                if (!valid_parity) {
-                    continue;
-                }
-                valid = valid_parity;
-                // User Fields
-                returnCode.numberOfUserFields = config.numUserFields;
-                for (int j = 0; j < config.numUserFields; j++) {
-                    BitField userField(config.userFields[j].bitLength); // TODO: make platform independent
-                    int startBit = config.userFields[j].startBit;
-                    int length = config.userFields[j].bitLength;
-                    for (int k = startBit; k < startBit + length; ++k) {
-                        userField <<= 1;
-                        userField |= (bool)_code[k];
-                    }
-                    Serial.print("FACILITY CODE ");
-                    //Serial.println(userField.to_ulong());
-                    if (userField == config.userFields[j].successId) {
-                        returnCode.successes[j] = true;
-                    } else if (userField == config.userFields[j].failureId) {
-                        returnCode.successes[j] = false;
-                    } else {
-                        valid = false;
-                        Serial.println("INVALID FACILITY CODE");
-                        break;
-                    }
-                }
-
-                // Identifier
-                returnCode.id = 0;
-                for (int j = config.idFieldStartBit; j < config.idFieldStartBit + config.idFieldLength; ++j) {
-                    returnCode.id <<= 1;
-                    returnCode.id.set(0, _code[j]);
-                }
-                Serial.println();
-
-                _returnCode = returnCode;
-
-                if (valid) {
+                    valid_parity = false;
                     break;
                 }
+                Serial.print(" Parity Ok ");
+                Serial.println(j + 1);
+            }
+            if (!valid_parity) {
+                _bitCount=0;
+                return false;
+            }
+            valid = valid_parity;
+            // User Fields
+            returnCode.numberOfUserFields = config.numUserFields;
+            for (int j = 0; j < config.numUserFields; j++) {
+                BitField userField(config.userFields[j].bitLength); // TODO: make platform independent
+                int startBit = config.userFields[j].startBit;
+                int length = config.userFields[j].bitLength;
+                for (int k = startBit; k < startBit + length; ++k) {
+                    userField <<= 1;
+                    userField |= (bool)_code[k];
+                }
+                Serial.print("FACILITY CODE ");
+                //Serial.println(userField.to_ulong());
+                if (userField == config.userFields[j].successId) {
+                    returnCode.successes[j] = true;
+                } else if (userField == config.userFields[j].failureId) {
+                    returnCode.successes[j] = false;
+                } else {
+                    valid = false;
+                    Serial.println("INVALID FACILITY CODE");
+                    break;
+                }
+            }
+
+            // Identifier
+            returnCode.id = 0;
+            for (int j = config.idFieldStartBit; j < config.idFieldStartBit + config.idFieldLength; ++j) {
+                returnCode.id <<= 1;
+                returnCode.id.set(0, _code[j]);
+            }
+            Serial.println();
+
+            _returnCode = returnCode;
+
+//                if (valid) {
+//                    break;
+//                }
 //		    }
             _bitCount=0;
             return valid;

@@ -1,14 +1,14 @@
 #include "bitfield.h"
 
 BitField::BitField(int size) {
-    this.size = size;
+    this->size = size;
     for (int i = 0; i < _BUCKETS; ++i) {
         buffer[i] = 0;
     }
 }
 
 BitField::BitField(const BitField& rhs) {
-    this.size = rhs.size;
+    this->size = rhs.size;
     for (int i = 0; i < _BUCKETS; ++i) {
         buffer[i] = rhs.buffer[i];
     }
@@ -70,5 +70,8 @@ bool BitField::operator== (const BitField& rhs) const {
 }
 
 unsigned long long BitField::temp(int p) {
+    if (p == _BUCKETS - 1) {
+       return buffer[p] & (~(-1ll << (this->size & _MOD_AND)));
+    }
     return buffer[p];
 }
