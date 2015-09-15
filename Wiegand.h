@@ -7,7 +7,7 @@
 #include "WProgram.h"
 #endif
 #include <math.h>
-#include <bitset>
+#include "bitfield.h"
 
 #define D0Pin 2			// Arduino Pin 2 Hardware interrupt
 #define D1Pin 3			// Arduino Pin 3 Hardware interrupt
@@ -15,7 +15,7 @@
 
 const int INT_SIZE = sizeof(int)*8;
 const int BUFFER_SIZE = MAX_BIT_LENGTH / INT_SIZE;
-#define BitField std::bitset<256>
+//#define BitField std::bitset<256>
 
 
 struct WiegandUserField {
@@ -40,7 +40,6 @@ struct WiegandReturn {
 };
 
 struct WiegandConfig {
-    char name[32];
     int bitLength;
     int idFieldStartBit;
     int idFieldLength;
@@ -63,7 +62,7 @@ public:
 	int getWiegandType();
     void ReadD0();
     void ReadD1();
-    WiegandConfig   _configs[8];
+    WiegandConfig config;
 
 private:
     void init(unsigned int d0Pin, unsigned int d1Pin);
