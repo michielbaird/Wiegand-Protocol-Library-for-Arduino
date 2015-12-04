@@ -6,6 +6,13 @@ BitField::BitField(int size) {
         buffer[i] = 0;
     }
 }
+BitField::BitField(int size, int val) {
+    this->size = size;
+    for (int i = 0; i < _BUCKETS; ++i) {
+        buffer[i] = 0;
+    }
+    buffer[0] = val;
+}
 
 BitField::BitField(const BitField& rhs) {
     this->size = rhs.size;

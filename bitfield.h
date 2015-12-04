@@ -10,6 +10,7 @@ class BitField {
   public:
     BitField();
     BitField(int);
+    BitField(int, int);
     BitField(const BitField& rhs);
     BitField& operator<<= (int pos);
     BitField& operator|= (const BitField& rhs);

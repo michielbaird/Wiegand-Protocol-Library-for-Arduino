@@ -45,8 +45,8 @@ void WIEGAND::init(unsigned int d0Pin, unsigned int d1Pin)
     }
     config.userFields[0].startBit = 1;
     config.userFields[0].bitLength = 8;
-    config.userFields[0].successId = 1;
-    config.userFields[0].failureId = 54;
+    config.userFields[0].successId = BitField(8, 1);
+    config.userFields[0].failureId = BitField(8, 54);
 
 }
 
@@ -128,7 +128,7 @@ bool WIEGAND::DoWiegandConversion ()
                 for (int k = 0; k < _bitCount; k++) {
                     if (config.parityBits[j].mask[k]) {
                         val ^= _code[k];
-                        Serial.print(_code[k]);
+                        //Serial.print(_code[k]);
                     }
                 }
 
@@ -138,13 +138,13 @@ bool WIEGAND::DoWiegandConversion ()
 
                 if (_code[config.parityBits[j].bitPosition] !=
                     (bool) val) {
-                    Serial.print(" Parity Bad ");
-                    Serial.println(j + 1);
+//                    Serial.print(" Parity Bad ");
+//                    Serial.println(j + 1);
                     valid_parity = false;
                     break;
                 }
-                Serial.print(" Parity Ok ");
-                Serial.println(j + 1);
+//                Serial.print(" Parity Ok ");
+//                Serial.println(j + 1);
             }
             if (!valid_parity) {
                 _bitCount=0;
@@ -154,14 +154,14 @@ bool WIEGAND::DoWiegandConversion ()
             // User Fields
             returnCode.numberOfUserFields = config.numUserFields;
             for (int j = 0; j < config.numUserFields; j++) {
-                BitField userField(config.userFields[j].bitLength); // TODO: make platform independent
+                BitField userField(config.userFields[j].bitLength);
                 int startBit = config.userFields[j].startBit;
                 int length = config.userFields[j].bitLength;
                 for (int k = startBit; k < startBit + length; ++k) {
                     userField <<= 1;
-                    userField |= (bool)_code[k];
+                    userField.set(0, (bool)_code[k]);
                 }
-                Serial.print("FACILITY CODE ");
+                // Serial.print("FACILITY CODE ");
                 //Serial.println(userField.to_ulong());
                 if (userField == config.userFields[j].successId) {
                     returnCode.successes[j] = true;
@@ -169,7 +169,7 @@ bool WIEGAND::DoWiegandConversion ()
                     returnCode.successes[j] = false;
                 } else {
                     valid = false;
-                    Serial.println("INVALID FACILITY CODE");
+                    //Serial.println("INVALID FACILITY CODE");
                     break;
                 }
             }
@@ -180,7 +180,7 @@ bool WIEGAND::DoWiegandConversion ()
                 returnCode.id <<= 1;
                 returnCode.id.set(0, _code[j]);
             }
-            Serial.println();
+            //Serial.println();
 
             _returnCode = returnCode;
 
